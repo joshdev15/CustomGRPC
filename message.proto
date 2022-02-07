@@ -1,0 +1,19 @@
+syntax = "proto3"; 
+option go_package = "./proto"; 
+
+message Notification {
+  string id = 1;
+  string msj = 2;
+}
+
+message NewNotifReq {
+  string msj = 1;
+}
+
+message NewNotifResp {
+  string feedback = 1;
+}
+
+service NotificationService {
+  rpc New(NewNotifReq) returns (NewNotifResp); 
+}
