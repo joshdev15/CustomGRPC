@@ -4,15 +4,17 @@ import (
 	"CustomGRPC/proto"
 	"context"
 	"fmt"
+	"time"
 
 	"google.golang.org/grpc"
 )
 
 func main() {
 	serviceClient := connection()
-	for i := 1; i < 10000; i++ {
-		callNew(serviceClient)
+	for i := 0; i < 100050; i++ {
+		go callNew(serviceClient, i)
 	}
+	time.Sleep(5 * time.Second)
 }
 
 // Creamos la conexion con el servidor que ya
@@ -30,11 +32,13 @@ func connection() proto.NotificationServiceClient {
 	return serviceClient
 }
 
-func callNew(serviceClient proto.NotificationServiceClient) {
+func callNew(serviceClient proto.NotificationServiceClient, index int) {
 	// Realizamos una llamada inmediata a nuetro microservicio
 	// usando el metodo preestablecido en el proto (en este caso New).
+	message := fmt.Sprintf("Este es el mensaje %v", index)
+
 	resp, err := serviceClient.New(context.Background(), &proto.NewNotifReq{
-		Msj: "Este es un mensaje",
+		Msj: message,
 	})
 
 	// Verificamos un posible error
