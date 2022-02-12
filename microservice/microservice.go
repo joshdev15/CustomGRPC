@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	serverType = "tcp"
-	port       = ":50051"
-	counter    = 0
+	serverType      = "tcp"
+	port            = ":50051"
+	counter    uint = 0
 )
 
 // Creamos una estructura que implemente
@@ -26,12 +26,23 @@ type NotificationServer struct {
 // personalizados) que se necesita para implementar
 // la interfaz.
 func (s *NotificationServer) New(ctx context.Context, req *proto.NewNotifReq) (*proto.NewNotifResp, error) {
-	counter++
-	fmt.Printf("Nueva notification %v\n", counter)
+	cch := make(chan uint)
+	UpdateCounter(cch)
+	newCounterValue := <-cch
+	counter = newCounterValue
 	feedback := fmt.Sprintf("Este es el Feedback %v", counter)
+	fmt.Printf("Nueva notification %v\n", counter)
 	return &proto.NewNotifResp{
 		Feedback: feedback,
 	}, nil
+}
+
+func UpdateCounter(cch chan uint) {
+	go func() {
+		// time.Sleep(10 * time.Millisecond)
+		newValueOfCounter := counter + 1
+		cch <- newValueOfCounter
+	}()
 }
 
 // En la funcion main (en este caso), establecemos
