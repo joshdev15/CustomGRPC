@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -14,13 +15,15 @@ func main() {
 	for i := 0; i < 100050; i++ {
 		go callNew(serviceClient, i)
 	}
+	// Esperamos por la respuesta
+	// sin que finalize nuestra funcion main
 	time.Sleep(5 * time.Second)
 }
 
 // Creamos la conexion con el servidor que ya
 // debería estar corriendo en el puerto 50051.
 func connection() proto.NotificationServiceClient {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic("No se puede conectar con el servidor")
 	}
@@ -28,7 +31,7 @@ func connection() proto.NotificationServiceClient {
 	// Si la conexion es exitosa lo pasamos como argumento
 	// a la estructura que trabajará como cliente.
 	serviceClient := proto.NewNotificationServiceClient(conn)
-	fmt.Printf("Service Client: %v; Type: %T", serviceClient, serviceClient)
+	fmt.Printf("Service Client Created | Type: %T", serviceClient)
 	return serviceClient
 }
 
