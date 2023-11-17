@@ -12,7 +12,7 @@ import (
 
 func main() {
 	serviceClient := connection()
-	for i := 0; i < 100050; i++ {
+	for i := 0; i < 10000; i++ {
 		go callNew(serviceClient, i)
 	}
 	// Esperamos por la respuesta
